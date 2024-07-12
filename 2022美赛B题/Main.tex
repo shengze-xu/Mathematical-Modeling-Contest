@@ -1,0 +1,748 @@
+\documentclass{mcmthesis}
+\mcmsetup{CTeX =false,   % 使用 CTeX 套装时，设置为 true
+        tcn = 2212272, problem = B,
+        sheet = true, titleinsheet =true, keywordsinsheet = true,
+        titlepage =false, abstract = false}
+\usepackage{palatino}
+\usepackage{lipsum}
+\usepackage{times}
+\usepackage{geometry}
+%===============设置正文和数学字体=============================
+%有些字体需要安装一些字体文件，注意辨别。
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{subfigure}
+%设置段落之间的距离，若不需要删除或者注释掉即可。
+\setlength\parskip{.5\baselineskip}
+\newtheorem{definition}{Definition}[section]
+%\def\abstractname{Summary}%可修改摘要名称
+
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+
+\usepackage{chngpage}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage[numbers,sort&compress]{natbib}
+%%% 实现参考文献标号在右上角
+\newcommand{\upcite}[1]{\textsuperscript{\textsuperscript{\cite{#1}}}}
+%然后引用的时候使用\upcite{}的格式（一般的正常引用格式为\cite{}）
+
+\usepackage{titletoc}
+\titlecontents{section}[3cm]{\bf \large}{\contentslabel{2.8em}}{}{%
+\titlerule*[0.5pc]{$\cdot$}\contentspage}%
+\titlecontents{subsection}[4cm]{\normalsize}{\contentslabel{2.5em}}{}{%
+\titlerule*[0.5pc]{$\cdot$}\contentspage}%
+\titlecontents{subsubsection}[5.3cm]{\normalsize}{\contentslabel{3.0em}}{}{%
+\titlerule*[0.5pc]{$\cdot$}\contentspage}%
+
+\title{\large Strategies of Water and Hydroelectric Power Sharing Based on Multi-objective Programming}
+\author{ }
+
+
+\date{\today}
+
+\geometry{left=3.0cm,right=3.0cm}
+\setlength{\headheight}{17pt}
+\begin{document}
+\begin{abstract}
+	
+Due to the threat of recent drought, water in the Colorado River system has struggled to meet the water and electricity demands of nearby states under original compacts. To this end, we will build a mathematical model that gives the allocation of water in five states, taking into account the current storage and power generation capacity of Glen Canyon Dam and Hoover Dam.
+
+Firstly, we need to establish a \textbf{multi-objective programming model} for the allocation scheme. Based on the geographic relationships and how the two dams work, we explored preliminary relationships for a range of physical quantities. We then specified the goal of the model, which is to meet the water and electricity demand as much as possible while keeping potential transportation costs as low as possible. We add the objective to the weight to construct the overall multi-objective function. In order to make the model meet the demand under drought conditions, we also added concession parameters to the constraints, and combined with the equality constraints between physical quantities. We can obtain the allocation scheme by solving the model. 
+
+Then based on the model, we will answer the problems given in the requirements. For problem 1, it is solved in an environment with stated demand. We searched for a series of realistic data, and set the weights and concession parameters in the objective function accordingly, and use lingo to solve it. Through data analysis, we finally got the annual allocation plan and calculated the time and the additional amount of water supply. 
+
+For problem 2, we also collected a series of data as a reference for the evaluation. The weighting coefficients for water and hydropower for each state were then obtained using \textbf{AHP}, and the process passed the consistency test. After the correlation coefficients are obtained, the relative importance of water uses among states and between water and electricity can be explained, thereby showing that conflicts of interests can be resolved by adjusting the parameters. 
+
+For problem 3, according to the situation of water shortage, combined with the weight coefficient obtained by the AHP, we made certain adjustments to the previously established concession parameters and substituted them into the established ones. Solving models, effective solutions are obtained.
+ 
+For problem 4, under the condition that the demand changes over time, according to the split of monthly demand, we explain that under this model, it is necessary to reduce demand expectations in advance. Meanwhile, for various possible changes of conditions, we explain the way the corresponding parameters of the model change, and provide solutions. 
+
+At last, we conduct an overall sensitivity analysis of the model, summarizing the strengths and weaknesses of the model.
+\begin{keywords}
+Multi-Objective Programming Model, Constraints, AHP, Weight Coefficient 
+\end{keywords}
+\end{abstract}
+\maketitle
+%\pagestyle{empty}
+\newpage                                                          %
+%==================================================================
+%====================生=成=目=录===================================
+\begin{adjustwidth}{-1cm}{0cm}
+
+\setcounter{tocdepth}{3}
+\thispagestyle{empty}
+\tableofcontents                                                  %
+
+\end{adjustwidth}
+
+
+\newpage
+
+\pagestyle{fancy}
+
+\setcounter{page}{1}
+\section{Introduction}
+\subsection{Background}
+Due to reduced rainfall due to climate change, the Colorado River Basin has experienced a massive drought, and the water level of two major reservoirs has continued to decrease. Under previous years' conventions, the five states in the Hoover Dam and Glen Canyon Dam watersheds have been adopting fixed water abstraction, electricity generation and distribution of hydroelectricity. This approach can quickly lead to a shortage of water in the reservoir, as demand is not allocated based on factors such as changes in rainfall.
+
+In order to mitigate this disaster, we need to find a solution for reservoir water allocation and power generation that can adapt to climate change. 
+\subsection{Our Work}
+First, we transformed the problem into a model for solving planning problems. In the first question, we adjusted the parameters when the initial value of the water volume was sufficient to gain an understanding. In the second question, we determined the importance of hydropower in different regions through the AHP method. Based on this, we set up a parameter solution. In the third question, we analyze and modify the parameters required to make the model meet the situation of insufficient water. In the fourth question, we analyze the performance of the model under different conditions. The data in each question comes from real data. We used lingo to process and solve the data, and finally we integrated the model and gave a brief introduction in the form of a magazine article.
+\begin{figure}[h]
+	\caption{Flow chart}
+	\centering{\includegraphics[width=1\textwidth]{mind.png}}
+\end{figure}
+\section{Assumptions and Justification}
+
+\begin{itemize}
+\item Consider the five states and two dam watersheds as a closed system where water and electricity are provided only in this area.
+
+$\hookrightarrow$Justification: If the external hydropower input is considered, the external input is complicated and difficult to count, and the external water supply obtained in this basin is less and can be ignored.
+
+\item Approximate the dam reservoir as a cylinder.
+
+$\hookrightarrow$Justification: The shape is basically close to a cylinder, so there is no large error, and the cylinder is easy to calculate.
+
+\item The difference in power generation effect caused by the change of water level is negligible.
+
+$\hookrightarrow$Justification: The water level is relatively small relative to the power generation height of the dam, and the mechanical energy generated is negligible
+
+\item Water loss caused by evaporation, land absorption, etc. is not considered.
+
+$\hookrightarrow$Justification: Water loss is small and difficult to count so that is ignored. 
+\end{itemize}
+
+\section{List of Notation}
+
+\begin{table}[h]
+	\centering
+	\caption{The List of Notation}
+	\begin{tabular}{p{.1\textwidth}p{.8\textwidth}m{.4\textwidth}}
+		\hline
+		Symbol& Meaning \\
+		\hline
+		$E_{ij}$&Dam $i$ generates electricity distributed to state $j$ \\
+		$WD_{ij}$ & Dam $i$ takes water distributed to state $j$ \\
+		$Hw_i$&Variation of water level in dam $i$ due to water intake\\
+		$WE_i$&Water consumption for dam $i$ power generation\\
+		$He_i$&Changes in water levels due to dam $i$ power generation\\
+		$W_j$&Total water allocated to state $j$\\
+		$E_j$&Total electricity allocated to state $j$\\
+		$H_i$&Changes in water level caused by water withdrawal from reservoirs\\
+		$HA_i$&Changes in the total water level of the reservoir\\
+		\hline
+		$WN_j$&State $j$ water needs\\
+		$EN_j$&State $j$ electricity needs\\
+		$S_i$& Reservoir $i$ surface area\\
+		$HD_i$&Minimum water level for dam $i$ power generation\\
+		$P$&Water level in Lake Powell\\
+		$M$&Water level in Lake Mead\\
+		$WM$&Water demand in mexico\\
+		$K_i$&The energy conversion rate of dam $i$, $0<K_i<1$\\
+		$HE_i$&The power generation height of dam $i$\\
+		\hline
+	\end{tabular}
+\end{table}
+In the above variable table, the symbol $i$ represents the dam, 1 is the Glen Canyon Dam, 2 is the Hoover Dam, and $j$ represents the state, 1 to 5 are AZ, CA, WY, CO, NM respectively.
+
+\newpage
+\section{Model: Multi-Objective Programming}
+\subsection{Model overview}
+As we all know, the relationship between the various quantities is first determined according to the total amount of water flow. In this model, we assume that there are no other forms of water increase and loss (such as evaporation and rainfall).
+\begin{figure}[h]
+	\caption{Map}
+	\centering
+	\subfigure{
+		\begin{minipage}{7cm}
+			\centering
+			\includegraphics[scale=0.37]{map1.png}
+		\end{minipage}
+	}
+	\subfigure{
+		\begin{minipage}{7cm}
+			\centering
+			\includegraphics[scale=0.53]{map2.png}
+		\end{minipage}
+	}	
+\end{figure}
+
+First we determine the flow relationship of the water at Dam $i$:
+\begin{equation}
+	S_i\cdot H_i=WE_i+\sum_{j=1}^{5}WD_{ij},i=1,2
+\end{equation}
+
+Next we determine the relationship between the relevant quantities of reservoir 1:
+\begin{equation} 
+	\left\{ 
+	\begin{aligned}
+		HA_1&=H_1\\
+		Hw_1\cdot S_1&=WD_1\\
+		He_1\cdot S_1&=WE_1\\
+	\end{aligned}
+	\right. 
+\end{equation} 
+and the relationship between the relevant quantities of reservoir 2:
+\begin{equation} 
+	\left\{ 
+	\begin{aligned}
+		HA_2\cdot S_2+WE_1&=H_2\cdot S_2\\
+		Hw_2\cdot S_2&=WD_2\\
+		He_2\cdot S_2&=WE_2\\
+	\end{aligned}
+	\right. 
+\end{equation} 
+
+As shown in the figure, the power generation principle of the dam is to convert the mechanical energy of water into electrical energy. We ignore the original kinetic energy of the water, and the part of the gravitational potential energy higher than the water outlet is very small for the part of the gravitational potential energy falling from the water outlet, and we also ignore it. In fact, the total energy input to the energy conversion system is basically the gravitational potential energy of water at the height of power generation:
+\begin{equation}
+	E=WE\cdot g \cdot HE
+\end{equation}
+
+\begin{figure}[h]
+	\caption{Dam}
+	\centering{\includegraphics[width=0.6\textwidth]{powerplant.png}}
+\end{figure}
+
+In addition, energy loss will occur in the conversion system, and there is an energy conversion rate $K$, we have:
+\begin{equation}
+	E_i\cdot K_i=\sum_{j=1}^{5}ED_{ij}
+\end{equation}
+
+In order to ensure that this pumping will not make the water level reach the dangerous water level, the model has the following constraints:
+\begin{equation}
+	\left\{ 
+	\begin{aligned}
+		P-HD_1>&HA_1\\
+		M-HD_2>&HA_2\\
+	\end{aligned}
+	\right. 
+\end{equation}
+
+The total amount of water and total electricity distributed to the states is assigned to the two dams as follows:
+\begin{equation}
+	\left\{ 
+	\begin{aligned}
+		W_j&=\sum_{i=1}^{2}WD_{ij}\\
+		E_j&=\sum_{i=1}^{2}ED_{ij}\\
+	\end{aligned}
+	\right. 
+\end{equation}
+
+In order to achieve reasonable water use, we add a concession parameter when the hydropower demand cannot be fully realized. For any j, we have:
+\begin{equation}
+	\left\{ 
+	\begin{aligned}
+		W_j&\geq Zw_j\cdot WN_{j}\\
+		E_j&\geq Ze_j\cdot EN_{j}\\
+	\end{aligned}
+	\right. 
+\end{equation}
+
+In the above formula, $Zw_j$ and $Ze_j$ are concession parameters between 0 and 1, which represent the importance of the electricity or water demand of the state at that time, and the less important the demand is, the less the proportion of demand is satisfied.
+
+The same is true for Mexico's water constraints, the total flow of water to Mexico and the Gulf of California is the amount of water generated by Dam 2, we have:
+\begin{equation}
+	WE_2\geq Zm \cdot WM
+\end{equation}
+
+In the above formula, $Zm$ is also between 0 and 1, and its importance is obviously lower than the above two parameters, that is, when resources are tight, the domestic demand will be considered first, and the Mexican demand will be second, such as writing 0.
+
+The specific values of $Zw$, $Ze$ and $Zm$ need to be analyzed and determined according to other conditions. In the latter question, there will be an analysis of the concession of hydropower demand in the case of insufficient water supply. Obviously, the above concession parameters are all 1 in the case of sufficient water.
+
+In this way, we have completed the analysis of all constraints in the planning model. Now we need to find the final goal we need to achieve and the objective function obtained after the goal is quantified.
+
+Let us make it clear that in the above conditions, the amount we control is mainly the amount of water withdrawn from the reservoir $H_i$, the amount of water used for power generation $WE_i$, the amount of domestic water withdrawn, and the destination of the withdrawn water $WD_{ij}$.
+
+
+\subsection{Objective function}
+\subsubsection{Object 1: Meeting water and electricity needs}
+The clearest goal is to have the final hydropower delivery as close as possible to the parameters of demand, subject to constraints. Taking water as an example, we quantify it as the following formula:
+\begin{equation}
+	\sum_{j=1}^{5}(W_j-WN_{j})^2
+\end{equation}
+
+The above formula tends to be smaller when the actual water supply is close to the demand. In order to rationalize the weight in the objective function, we normalize the above formula and let this value be WT:
+\begin{equation}
+	\sum_{j=1}^{5}\frac{(W_j-WN_{j})^2}{WN_{j}^2}=WT
+\end{equation}
+
+In the same way, the measured and quantified value of the power demand target can be obtained:
+\begin{equation}
+	\sum_{j=1}^{5}\frac{(E_j-EN_{j})^2}{EN_{j}^2}=ET
+\end{equation}
+
+In order to achieve the best solution that meets the needs, we need to find a water intake and water source allocation amount under the above constraints to make the above two amounts as small as possible. There are also measures that try to meet the needs of Mexico:
+\begin{equation}
+	MT=(WE_2-WM)^2
+\end{equation}
+
+Since the constraints are relatively broad (that is, the water quantities $P$ and $W$ are still far from the dangerous water quantity $HD_i$). In fact, in the case of sufficient water quantity, it will be found that $WT$ and $ET$ can be taken to zero very simply. And since there are no relevant constraints on the distribution of water among several states, we can obtain an infinite number of water withdrawals and water delivery solutions when $WT=0$ and $ET=0$.
+
+Obviously, this is not realistic, because the amount of water delivered by the two dams to each state will lead to huge transportation costs. In order to keep the proportion of water and electricity delivered to each state fixed, we add an objective function that measures the transportation cost so that the transportation cost is minimized.
+
+\subsubsection{Object 2: Cost considerations}
+In this model, we express the transportation cost as a function of transportation distance and transportation volume. For the time being, let the distance from the dam $i$ to the state $j$ be $L_{ij}$, and the functional relationship between transportation distance and cost is $f(L_{ij})$. The functional relationship between quantity and cost is $g(WD_{ij})$(cost measurement is unitless, not an absolute quantity, but a relative quantity). In order to make the impact of the two functions increase or decrease in the same proportion, we write the total cost measurement function as $f\cdot g$.
+
+First discuss $f(L_{ij})$, the cost of transportation is basically proportional to the distance of transportation. The total distance of water transportation is actually quite variable, and it is difficult to make accurate statistics. In this model, we use the approximate distance from the dam to each state. In order to facilitate the weight distribution, we get:
+\begin{equation}
+	f(L_{ij})=\frac{L_{ij}}{\sum_{i=1}^{2}L_{ij}}
+\end{equation}
+
+For $g(WD_{ij})$, since the amount of water has a specific value, we can directly use the amount of water as a measure. In order to make the weight adjustment easier, we normalize and get:
+\begin{equation}
+	g(WD_{ij})=\frac{WD_{ij}}{\sum_{i=1}^{2}WD_{ij}}
+\end{equation}
+
+It can be seen that the cost estimation function $f\cdot g$ is also the smaller the better.
+\subsubsection{Overall Object}
+After obtaining the basic target quantification functions of the two targets, the model writes the total target function as the weighted sum of the above targets as follows:
+
+\begin{equation}
+	\begin{aligned}	
+		A=&\sum_{j=1}^{5}Yw_j\cdot \frac{(W_j-WN_{j})^2}{WN_{j}^2}+\sum_{j=1}^{5}Ye_j\cdot \frac{(E_j-EN_{j})^2}{EN_{j}^2}+\\
+		&Y_m\cdot (WE_2-WM)^2+\sum_{i=1}^{2}\sum_{j=1}^{5}Yd_{ij}\cdot f(L_{ij})\cdot g(WD_{ij})
+	\end{aligned}
+\end{equation}
+
+In the above formula, $Yw_j$ is the weight of water importance in each state, $Ye_j$ is the weight of electricity importance in each state, $Ym$ is the weight of water importance in Mexico, and $Yd_{ij}$ is the importance of the cost of dam transporting water to each state Weight, the larger the weight, the greater the impact on the objective function. The establishment of the weight is mainly through the analysis of the actual industrial and agricultural water and electricity demand in each state and the transportation conditions of each state. The specific analysis method will be given later.
+
+It can be seen that our goal is to make the above $A$ as small as possible. The planning conditions have been listed above. It can be seen that the conditions of the variables are all linear conditions, and the model of this problem is transformed into a linear programming problem. To solve the model, we use the algorithm that comes with lingo.
+
+\section{Problem1: Allocation plan under stated demands}
+\subsection{Data Input}
+This question has stipulated that the demand in each state is constant, so we stipulate that the demand is in units of years, that is, the water consumption $WN_i$ and the electricity consumption $WE_i$ of a certain state in a certain year. 
+
+In order to solve the problem and verify the correctness of our model, we collected data on water and electricity consumption in previous years, as well as some parameters of dams and reservoirs, as shown in the following figure:
+
+\begin{table}[h]
+	\centering
+	\caption{Water and Electricity}
+	\begin{tabular}{ccccccc}
+		\hline
+		& AZ   & CA   & WY   & CO   & NM   & Mexico \\
+		\hline
+		Water($\times10^9m^3$)             & 3.52 & 5.43 & 1.29 & 4.76 & 1.03 & 0.9    \\
+		Electricity ($\times10^8kw\cdot h$) & 6.8  & 20.4 & 3.84 & 14   & 6.4  &   /  \\
+		\hline  
+	\end{tabular}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\caption{Data about Dams}
+	\begin{tabular}{ccc}
+		\hline
+		& Glen Canyon Dam            & Hoover Dam               \\
+		\hline
+		Surface area   & 6.5$\times10^8m^2$         & 6.4$\times10^8m^2$       \\
+		Minimum height & 1060$m$                      & 290$m$                     \\
+		Efficiency     & 1.5$\times10^8kw\cdot h /m$ & 2.5$\times10^8kw\cdot h /m$\\
+		\hline
+	\end{tabular}
+\end{table}
+
+\subsection{Weight Analysis}
+The above are the input variables to solve the model, which require the variables in the final allocation scheme, and we also need to know the weight (importance) parameters in $A$.
+
+This question requires the time when the supply and demand imbalance occurs. It can be considered that the initial value is sufficient to meet water and electricity, so $WT$, $ET$ and $MT$ in $A$ can all reach 0. At this time, their weights are no longer important. After solving the model We set it to 1, that is, $Yw$, $Zw$, $Ye$, $Ze$, $Ym$, $Zm$ are all set to 1.
+
+The key to determining the final allocation of this question is the size of the transportation cost. After debugging, we adopt the following parameter setting rules: For any dam, compare the distances between the two of them to each state. If the distance from the same state to the two dams is relatively large, assign a weight of 1 to the nearest and 5 to the farthest. Conversely, assign a weight value of 1 to the nearest and 2 to the farthest. The table below shows the distances from the two dams to the states.
+
+\begin{table}[h]
+	\centering
+	\caption{Distances from dams to states}
+	\begin{tabular}{cccccc}
+		\hline
+		& AZ  & CA  & WY   & CO  & NM  \\
+		\hline
+		Lake Mead   & 314 & 469 & 1029 & 797 & 838 \\
+		Lake Powell & 325 & 750 & 715  & 552 & 530\\
+		\hline
+	\end{tabular}
+\end{table}
+
+Finally, we get the following weight matrix $Yd$:
+\begin{equation}
+	\begin{bmatrix}
+		2&5&1&1&1\\
+		1&1&5&5&5
+	\end{bmatrix}
+\end{equation}
+\subsection{Substitute to get the solution}
+
+We substitute the weights and parameters into the above model, use lingo to solve the planning, and obtain the optimal allocation for each year as follows.
+
+For the first year, $He_1=2.5m$, $Hw_1=10.9m$, $He_2=1.7m$, $Hw_2=12.7m$. Among them, $10.88\times 10^8m^3$ of $He_2$ meets the needs of Mexico, and $1.88\times 10^8m^3$ flows into the Gulf of California.
+
+In the second year, there is sufficient water in the dam, all the same as in the first year.
+
+For the third year, $He_1=2.7m$, $Hw_1=12.2m$, $He_2=1.7m$, $Hw_2=12.7m$.
+Among them, $10.88\times 10^8m^3$ of $He_2$ meets the needs of Mexico.
+
+The hydropower distribution of the dam to each state is as follows: dam 1 meets all water needs of states 3, 4, and 5, and bears the $8.4\times 10^8m^3$ needs of state 1; dam 2 meets all water needs of state 2 and the state 1's $268\times10^8m^3$ water requirements.
+Dam 1 meets all the electricity needs of states 3, 4, and 5 and is in excess of $0.14$, $1.86$, and $0.39$, respectively; Dam 2 meets the electricity needs of states 1, 2.
+
+The warning water level is reached in the fourth year. The model fails to run and the entire process terminates.
+
+We plot the year-by-year water level data as follows:
+
+\begin{figure}[h]
+	\caption{Water level}
+	\centering
+	\subfigure[Lake Powell]{
+		\begin{minipage}{7cm}
+			\centering
+			\includegraphics[scale=0.6]{level1.png}
+		\end{minipage}
+	}
+	\subfigure[Lake Mead]{
+		\begin{minipage}{7cm}
+			\centering
+			\includegraphics[scale=0.6]{level2.png}
+		\end{minipage}
+	}	
+\end{figure}
+
+As shown in the figure, the amount of water flowing from Dam 1 to Dam 2 in a year with sufficient water is $WE_1=He_1\cdot S_1=16.25$.
+
+The annual water level changes according to the deployment plan. The data in the figure shows that the model can last for 3 years under this initial condition.
+
+In order to meet the demand all the time, the amount of external water required per year is $(P-P')\cdot S_1+(M-M')\cdot S_2=171.6\times 10^8m^3$.
+
+
+\section{Problem2: Solutions for conflicting requirements}
+\subsection{AHP frame}
+We used AHP to determine the criteria to use when resolving conflicts of interest, the basic framework of which is shown in the figure below.
+
+\begin{figure}[h]
+	\caption{Frame diagram}
+	\centering{\includegraphics[width=1.0\textwidth]{structure.png}}
+\end{figure}
+
+Among them, we need to use some basic data of each state, as shown in the following two tables.
+\begin{table}[h]
+	\centering
+	\caption{Data on water and electricity by state}
+	\begin{tabular}{cccccccc}
+		\hline  
+		\multicolumn{1}{l}{} & \multicolumn{3}{c}{Share of water use by state(\%)} & \multicolumn{2}{c}{Water} & \multicolumn{2}{c}{Electricity} \\
+		\hline  
+		Parameter            & Agricultural     & Industrial     & Residential     & Demands      & Price      & Demands         & Price         \\
+		\hline  
+		AZ                   & 77               & 12.6           & 20.4            & 3.52         & 37         & 6.8             & 104           \\
+		CA                   & 77.6             & 1.8            & 20.6            & 5.43         & 65         & 20.4            & 180           \\
+		WY                   & 97.3             & 1.3            & 1.4             & 1.29         & 52         & 3.84            & 83            \\
+		CO                   & 90.2             & 1.3            & 8.5             & 4.76         & 37         & 14              & 103           \\
+		NM                   & 86.5             & 3.3            & 10.2            & 1.03         & 28         & 6.4             & 93        \\
+		\hline     
+	\end{tabular}
+\end{table}
+\subsection{Conflict among water demands}
+First, we consider the distribution of water, establish a comparison matrix of each quantity according to its relationship, and obtain the largest eigenvalue and its corresponding coefficient vector and consistency test coefficient. As shown below, each comparison matrix can pass the consistency test.
+
+In the following table, $\lambda$, $\omega$, $CI$ represent largest eigenvalue, coefficient vector, consistency indicator, respectively.
+
+\begin{table}[h]
+	\centering
+	\caption{Calculated relative values for water}
+	\begin{tabular}{ccc}
+		\hline
+		Variable     & Matrix & Other calculated values                           \\
+		\hline
+		Agriculture  &     \begin{tabular}[c]{@{}l@{}} \\ $
+			A_1=\begin{bmatrix}
+				1&1&\frac{1}{7}&\frac{1}{4}&\frac{1}{2}\\
+				1&1&\frac{1}{7}&\frac{1}{4}&\frac{1}{2}\\
+				7&7&1&2&3\\
+				4&4&\frac{1}{2}&1&2\\
+				2&2&\frac{1}{3}&\frac{1}{2}&1
+			\end{bmatrix}
+			$\\ \\\end{tabular}& \begin{tabular}[c]{@{}l@{}} $\lambda_1=5.00665$\\ $\omega_1=[0.07,0.07,0.46,0.26,0.14]$\\ $CI_1=0.0017$\end{tabular} \\
+		\hline
+		Industrial   & \begin{tabular}[c]{@{}l@{}} \\ $
+			A_2=\begin{bmatrix}
+				1&3&5&5&\frac{1}{2}\\
+				\frac{1}{3}&1&2&2&\frac{1}{5}\\
+				\frac{1}{5}&\frac{1}{2}&1&1&\frac{1}{9}\\
+				\frac{1}{5}&\frac{1}{2}&1&1&\frac{1}{9}\\
+				2&5&9&9&1
+			\end{bmatrix}
+			$\\ \\\end{tabular} & \begin{tabular}[c]{@{}l@{}} $\lambda_2=5.00577$\\  $\omega_2=[0.28,0.10,0.05,0.05,0.52]$\\ $CI_2=0.0014$\end{tabular} \\
+		\hline
+		Residential  & \begin{tabular}[c]{@{}l@{}} \\ $
+			A_3=\begin{bmatrix}
+				1&1&9&4&3\\
+				1&1&9&4&3\\
+				\frac{1}{9}&\frac{1}{9}&1&\frac{1}{3}&\frac{1}{4}\\
+				\frac{1}{4}&\frac{1}{4}&3&1&\frac{1}{2}\\
+				\frac{1}{3}&\frac{1}{3}&4&2&1
+			\end{bmatrix}
+			$\\ \\\end{tabular} & \begin{tabular}[c]{@{}l@{}} $\lambda_3=5.033$\\ $\omega_3=[0.37,0.37,0.03,0.09,0.14]$\\ $CI_3=0.0017$\end{tabular} \\
+		\hline
+		Water volume & \begin{tabular}[c]{@{}l@{}} \\ $
+			A_4=\begin{bmatrix}
+				1&\frac{1}{3}&3&\frac{1}{2}&4\\
+				3&1&7&2&9\\
+				\frac{1}{3}&\frac{1}{7}&1&\frac{1}{5}&2\\
+				2&\frac{1}{2}&5&1&7\\
+				\frac{1}{4}&\frac{1}{9}&\frac{1}{2}&\frac{1}{7}&1
+			\end{bmatrix}
+			$\\ \\\end{tabular} & \begin{tabular}[c]{@{}l@{}} $\lambda_4=5.044$\\  $\omega_4=[0.16,0.46,0.06,0.28,0.04]$\\  $CI_4=0.0109$\end{tabular} \\
+		\hline
+		Water price  & \begin{tabular}[c]{@{}l@{}} \\ $
+			A_5=\begin{bmatrix}
+				1&\frac{1}{4}&\frac{1}{3}&1&2\\
+				4&1&2&4&7\\
+				3&\frac{1}{2}&1&3&5\\
+				1&\frac{1}{4}&\frac{1}{3}&1&2\\
+				\frac{1}{2}&\frac{1}{7}&\frac{1}{5}&\frac{1}{2}&1
+			\end{bmatrix}
+			$\\ \\\end{tabular} & \begin{tabular}[c]{@{}l@{}} $\lambda_5=5.022$\\  $\omega_5=[0.11,0.45,0.28,0.11,0.05]$\\  $CI_5=0.0056$\end{tabular}\\
+		\hline
+	\end{tabular}
+\end{table}
+\newpage
+Considering that these five related quantities have the same weight coefficient for the overall water distribution, the total relationship coefficients are added to get the vector $[0.99,1.45,0.88,0.79,0.89]$, and the distribution weight coefficient, which is $\boldsymbol{ l}_{water}=[0.198,0.29,0.176,0.158,0.178]$.
+
+By analyzing the above $\omega_1$, $\omega_2$ and $\omega_3$, it can be known that when there is a conflict in water allocation, for each use of agricultural, industrial, and residential, the order of satisfaction of AZ and CA is residential>industrial>agricultural,WY is agricultural>industrial>agricultural>residential, CO is agricultural>residential>industrial, NM is industrial>agricultural=residential.
+\subsection{Conflict between water and electricity demands}
+After doing a similar analysis on electricity, a comparison matrix is established to obtain the maximum eigenvalue and its corresponding coefficient vector and the consistency test coefficient. As shown below, each comparison matrix can pass the consistency test.
+
+\begin{table}[h]
+	\centering
+	\caption{Calculated relative values for water}
+	\begin{tabular}{ccc}
+		\hline
+		Variable     & Matrix & Other calculated values                           \\
+		\hline
+		Electricity  &     \begin{tabular}[c]{@{}l@{}} \\ $
+			B_1=\begin{bmatrix}
+				1&\frac{1}{5}&2&\frac{1}{3}&1\\
+				5&1&9&2&5\\
+				\frac{1}{2}&\frac{1}{9}&1&\frac{1}{7}&\frac{1}{2}\\
+				3&\frac{1}{2}&7&1&3\\
+				1&\frac{1}{5}&2&\frac{1}{3}&1
+			\end{bmatrix}
+			$\\ \\\end{tabular}& \begin{tabular}[c]{@{}l@{}} $\lambda_1=5.0133$\\  $\omega_1=[0.09,0.48,0.05,0.29,0.09]$\\ $CI_1=0.0033$\end{tabular} \\
+		\hline
+		Electricity price   & \begin{tabular}[c]{@{}l@{}} \\ $
+			B_2=\begin{bmatrix}
+				1&\frac{1}{7}&3&1&2\\
+				4&1&8&4&6\\
+				\frac{1}{3}&\frac{1}{8}&1&\frac{1}{3}&\frac{1}{2}\\
+				1&\frac{1}{4}&4&1&2\\
+				\frac{1}{2}&\frac{1}{6}&2&\frac{1}{2}&1
+			\end{bmatrix}
+			$\\ \\\end{tabular} & \begin{tabular}[c]{@{}l@{}} $\lambda_2=5.033$\\  $\omega_2=[0.16,0.55,0.05,0.15,0.09]$\\  $CI_2=0.0083$\end{tabular} \\
+		\hline
+	\end{tabular}
+\end{table}
+In general, the two related quantities of electricity demand and electricity price have the same weight coefficient for the overall electricity distribution, then the coefficients related to electricity can be added to get $[0.25, 1.03, 0.10, 0.44, 0.18]$ , after normalization, $\boldsymbol{l}_elec=[0.125,0.515,0.050,0.220,0.090]$.
+
+Compared with the previous weight coefficient of water in $\boldsymbol{l}_{water}$, it can be known that when the interests of water and electricity conflict, AZ, WY and NM are given priority to meet the demand of water and then consider electricity. For CA and CO, the demand for electricity is given priority and then the demand for water is considered.
+
+\section{Problem3: Solutions under water shortage}
+When the remaining water in the reservoir does not meet the demand for water use and power generation, we should adjust the parameters of the model. According to the results of the previous question, we first need to appropriately adjust the concession parameters of demand according to the priority coefficients of each state in terms of water and electricity, and adjust the weight coefficients in the target accordingly. For better explanation, here will follow the data of the previous series of questions, and give a demonstration explanation of the parameter adjustment in the case of a certain water shortage.
+
+Considering the situation when the water level is $P=1068$ and $M=298$, the basic annual demand for water is the same as the first question. At this time, the model obviously has no solution under the first condition, and the coefficients of $Z_w$, $Z_e$, $Z_m$, $Y_w$, $Y_e$, $Y_m$ need to be adjusted. The basis for the adjustment comes from the distribution weight vector of water and electricity in the previous question, which can be better adapted to this problem: 
+\begin{equation}
+	\begin{aligned}
+		Z_w&=[0.6,0.8,0.5,0.4,0.5]\\
+		Z_e&=[0.5,0.9,0.2,0.7,0.4]
+	\end{aligned}
+\end{equation}
+\begin{equation}
+	\begin{aligned}
+		Y_w&=[1.2,1.6,1,0.8,1]\\
+		Y_e&=[1,1.8,0.4,1.4,0.8]
+	\end{aligned}
+\end{equation}
+
+Due to the shortage of domestic water resources, it is no longer considered to reserve more water for Mexico, $Z_m=Z_e=0$. Substituting into the model in this way, the water levels of the two reservoirs are finally reduced to the minimum water level, and the results of the distribution of water and electricity in each state are $W=[21.12,43.44,6.45,19.04,5.15]$,$E=[3.40,18.36,4.42,16.2,7.2]$ and as follows:
+\begin{equation}
+	WD=\begin{bmatrix}
+		1.63&0&6.45&19.04&5.15\\
+		19.49&43.44&0&0&0
+	\end{bmatrix}
+\end{equation}
+\begin{equation}
+	E=\begin{bmatrix}
+		0&1.76&4.42&16.2&7.2\\
+		3.4&16.6&0&0&0
+	\end{bmatrix}
+\end{equation}
+
+It can be seen that at this time, the distribution of water just meets the minimum demand set by the pre-parameters, and the electricity distribution for states 1 and 2 also meets the minimum demand set, but the electricity allocated for 3, 4, and 5 will be more than the demand. This series of results shows that when the water in the reservoir is insufficient, the model will give priority to meeting the minimum demand for water, while under certain conditions of electricity demand, it may overproduce electricity by increasing the flow of water between the two dams.
+\newpage
+\section{Problem4: Model adaptation under various conditions}
+\subsection{Changes in demand over time}
+In the previous questions we considered fixed demand for a whole year, but in fact, as asked in the first part of this question, demand will change over time. And our model can also give good results for changing requirements. Under the parameter setting of Problem 3, we consider the changing water and electricity demand of 5 states from January to August, as shown in the following table:
+\begin{table}[h]
+	\centering
+	\caption{Monthly water requirement}
+	\begin{tabular}{ccccccccc}
+		\hline
+		& Jan & Feb & Mar & Apr & May & Jun & Jul & Aug \\
+		\hline
+		AZ & 2.1 & 1.8 & 2.6 & 2.7 & 3.2 & 3.6 & 4.3 & 4.0 \\
+		CA & 3.8 & 3.9 & 4.4 & 4.6 & 4.8 & 4.6 & 5.1 & 5.6 \\
+		WY & 1.0 & 0.9 & 1.0 & 1.1 & 0.9 & 1.3 & 1.5 & 1.2 \\
+		CO & 3.4 & 3.6 & 3.9 & 3.7 & 4.1 & 4.2 & 4.6 & 4.5 \\
+		NM & 0.6 & 0.7 & 0.8 & 0.9 & 1.0 & 1.2 & 1.1 & 1.0 \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\caption{Monthly electricity requirement}
+	\begin{tabular}{ccccccccc}
+		\hline
+		& Jan  & Feb  & Mar  & Apr  & May  & Jun  & Jul  & Aug  \\
+		\hline
+		AZ & 0.6  & 0.7  & 0.5  & 0.4  & 0.5  & 0.6  & 0.7  & 0.8  \\
+		CA & 2.1  & 1.9  & 1.6  & 1.2  & 1.3  & 1.7  & 2.2  & 1.8  \\
+		WY & 0.40 & 0.36 & 0.30 & 0.24 & 0.20 & 0.28 & 0.34 & 0.42 \\
+		CO & 1.2  & 1.3  & 1.4  & 1.2  & 0.9  & 1.1  & 1.2  & 1.0  \\
+		NM & 0.5  & 0.7  & 0.4  & 0.4  & 0.5  & 0.5  & 0.6  & 0.8 \\
+		\hline
+	\end{tabular}
+\end{table}
+
+The water level changes obtained after substituting into the model are as follows:
+\begin{table}[h]
+	\centering
+	\caption{The value of $P$, $M$, $Hw_i$, $He_i$ per month (m)}
+	\begin{tabular}{ccccccccc}
+		\hline
+		& Jan     & Feb     & Mar     & Apr     & May     & Jun     & Jul     & Aug     \\
+		\hline
+		$P$    & 1068.00 & 1067.01 & 1065.97 & 1064.60 & 1063.53 & 1062.45 & 1061.23 & 1060.00 \\
+		$M$    & 298.0   & 297.1   & 296.3   & 295.3   & 294.3   & 293.1   & 291.9   & 290.5   \\
+		$Hw_1$ & 0.77    & 0.80    & 0.88    & 0.88    & 0.92    & 1.03    & 1.01    &    /     \\
+		$He_1$ & 0.22    & 0.24    & 0.22    & 0.19    & 0.16    & 0.19    & 0.22    &     /    \\
+		$Hw_2$ & 0.92    & 0.89    & 1.09    & 1.14    & 1.25    & 1.28    & 1.47    &      /   \\
+		$He_2$ & 0.17    & 0.16    & 0.13    & 0.10    & 0.11    & 0.14    & 0.18    &  
+		/ \\
+		\hline     
+	\end{tabular}
+\end{table}
+\newpage
+The image of the water level change is shown below:
+
+\begin{figure}[h]
+	\caption{Water level}
+	\centering
+	\subfigure[Lake Powell]{
+		\begin{minipage}{7cm}
+			\centering
+			\includegraphics[scale=0.6]{level3.png}
+		\end{minipage}
+	}
+	\subfigure[Lake Mead]{
+		\begin{minipage}{7cm}
+			\centering
+			\includegraphics[scale=0.6]{level4.png}
+		\end{minipage}
+	}	
+\end{figure}
+
+The model shows that in this case, the water level of the two reservoirs can only last for 7 months, which is different from the results of Problem 3. This is because the model we set up will give priority to meeting demand when there is enough water, and short-term monthly changes will meet demand, but this will also lead to future water shortages. This also shows that in the case of possible water shortages, parameters that can be reduced should be set in advance for a long-term period of time, rather than making adjustments when there is a real shortage in the short-term.
+\subsection{Changes in demand brought about by the environment}
+For the second question in the first part, when the population, agriculture and industrial development of each state increase or decrease accordingly, the corresponding industrial, agricultural, residential water demand and electricity demand will change, which indirectly affects the weight coefficient of each state. The changed data can be analyzed by using the Analytic Hierarchy Process (AHP) according to the process in Problem2, and then the adjustment coefficients can be substituted into the model to obtain the results.
+
+For the second part, if there is the introduction of new energy, the demand for hydropower in each state will decrease, and the demand for electricity will decrease, that is, modify the $EN$ part of the model, and enter the model after modification to obtain the distribution strategy in this case.
+
+For the third part, if the protection measures for water and electricity are introduced in advance, it will actually lead the states to reduce the demand for reservoir water and hydropower generation, so the $WN$ and $EN$ parts of the model will be adjusted down accordingly, and the revised model will be added to the model. If the annual water and electricity demand is still used as the standard, with a certain amount of water replenishment, the time period for which the reservoir can supply water will definitely increase.
+\section{Sensitivity analysis}
+When the demand changes due to some circumstances, such as population migration, the addition of new energy, etc., this model can adjust the demand through the analytic hierarchy process, and finally get a solution to make the system stable. When the importance of the target changes due to changes in transportation costs, changes in the application ratio of hydropower, etc., this model can also change the weight of the objective function through the AHP method to deal with it. 
+
+For example, when electricity consumption peaks in winter and summer, but the transportation cost is low, the weight in the power demand and the objective function can be increased, and the weight in the transportation cost can be reduced. To dam 2, although it may cause dam 2 to undertake more long-distance water transportation, it solves a relatively important power problem.
+\section{Strengths and Weaknesses}
+
+\subsection{Strengths}
+\begin{itemize}
+	\item The model objective function adds a part to measure the distance cost, which minimizes the cost of hydropower transportation while meeting the hydropower demand.
+	\item The constraints and objective functions of the model are not complicated, the solution planning is simple, and the data solution efficiency is increased.
+	\item The model has added parameters that change with the specific environment according to the analytic hierarchy process, which has high environmental adaptability and can cope with emergencies.
+\end{itemize}
+
+\subsection{Weaknesses}
+\begin{itemize}
+	\item The water cycle considered is not scientific enough. In order to simplify the model, it does not fully conform to reality, and factors that change the water volume such as rainfall and tributary inflow are not added.
+	\item The distribution plan is only effective and lacks foresight, and cannot take preventive measures according to future trends.
+\end{itemize}
+
+\begin{thebibliography}{10}  
+	\bibitem{ref1}Annegret Larsen, Joshua R.Larsen, Stuart N.Lane. 2020. Dam builders and their works: Beaver influences on the structure and function of river corridor hydrology, geomorphology, biogeochemistry and ecosystems.Earth-Science Reviews
+	Volume 218, July 2021, 103623.
+	\bibitem{ref2}USGS. 2017. Estimated Use of Water in the United States in 2015.
+	\bibitem{ref3}http://crc.nv.gov/index.php?p=info\&s=hupdates. Colorado River Commission of Nevada.
+	\bibitem{ref4}https://www.fb.org/market-intel/first-ever-colorado-river-water-shortage-declaration-spurs-water-cuts-in-th. 2021 .First-Ever Colorado River Water Shortage Declaration Spurs Water Cuts in the Southwest.
+	\bibitem{ref5}U.S.Energy Information. ELECTRICITY DATA BROWSER.
+	\bibitem{ref6}https://www.eia.gov/state/seds/archive/SEDS\_Production\_Report\_2019.pdf. SEDS\_Production\_Report\_2019
+	\bibitem{ref7}https://www.usbr.gov/uc/rm/crsp/index.html. 2021. Colorado River Storage Project.
+	\bibitem{ref8}https://www.usbr.gov/lc/hooverdam/faqs/powerfaq.html. Hoover Dam.
+	\bibitem{ref9}https://www.usbr.gov/uc/rm/crsp/gc/. Glen Canyon Unit.
+	\bibitem{ref10}1922. Colorado River Compact
+	\bibitem{ref10}2022. Hydrology Report
+	
+\end{thebibliography}
+
+\newpage
+\begin{center}
+	\LARGE
+	\textbf{Water and Hydroelectric Power Sharing under Drought Situations}
+\end{center}
+
+Dam power generation and water allocation adjustment plan under drought conditions
+2021.6.11. According to Reuters, the largest water conservancy project in the United States, the Hoover Dam, is under the threat of a rare drought, reaching 1,071.61 feet on Thursday, the lowest water level since it was built to store water in the 1930s! Four feet below the bottom line of the federal water shortage proclamation, continued development will result in widespread water outages in Arizona, Nevada and New Mexico.
+\begin{figure}[h]
+	\centering
+	\subfigure[Map]{
+		\begin{minipage}{7cm}
+			\centering
+			\includegraphics[width=0.6\textwidth]{map1.png}
+		\end{minipage}
+	}
+	\subfigure[Hoover Dam]{
+		\begin{minipage}{7cm}
+			\centering
+			\includegraphics[width=1\textwidth]{dam.png}
+		\end{minipage}
+	}	
+\end{figure}
+
+Under previous years' conventions, the five states in the Hoover Dam and Glen Canyon Dam watersheds have been adopting fixed water abstraction, electricity generation and distribution of hydroelectricity. This approach can quickly lead to a shortage of water in the reservoir, as demand is not allocated based on factors such as changes in rainfall.
+To address this situation we propose a model that can be solved to better execute the water abstraction and water generation scheme. First, we can obtain a series of equation conditions based on the map of the dam area and the physical model of the dam.
+
+\begin{figure}[h]
+	\centering
+	\subfigure[Lake Powell]{
+		\begin{minipage}{7cm}
+			\centering
+			\includegraphics[scale=0.28]{Powell.png}
+		\end{minipage}
+	}
+	\subfigure[Lake Mead]{
+		\begin{minipage}{7cm}
+			\centering
+			\includegraphics[scale=0.28]{Mead.png}
+		\end{minipage}
+	}	
+\end{figure}
+We use elastic constraints in the part of the model on meeting water and electricity demand. We choose to fully meet the water and electricity needs of the states and the water needs of Mexico when water is plentiful, using this as a constraint. When it cannot be fully satisfied, we use the AHP to conduct multi-objective analysis to discount each demand to ensure that it can develop for a longer time and make the areas that need more water or electricity get more supply.
+
+In the objective function, we first consider that the water intake should be as close as possible to the actual supply and demand, and secondly consider the transportation cost between the two dams and the five states, and weight the above variables to obtain the objective function. According to the above constraints, we can solve the minimum value of the objective function, so that the hydropower and demand are as consistent as possible, and at the same time, the cost of hydropower transportation is minimized.
+
+At the same time, this model also considers the water transport from the upstream dam to the downstream dam, which solves the problem of regional imbalance.
+
+When some emergencies or conditions change events occur, we only need to make reasonable modifications to the concession parameters of elastic demand, such as the increase or decrease of demand corresponding to population changes. Under this model, water resources allocation can be improved accordingly.
+
+What this paper involves is a theoretical model, and it is hoped that it will inspire the water resources management plan of dams in arid areas after practice. 
+
+
+\end{document}

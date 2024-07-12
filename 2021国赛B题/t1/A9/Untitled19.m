@@ -1,0 +1,17 @@
+x=[250 275 300 350 400];
+y=[5.4 9.68 16.1 31.04 42.04];
+m1=polyfit(x,y,2);
+n1=250:1:410;
+scatter(x,y);
+hold on;
+plot(n1,polyval(m1,n1)); 
+xlabel('温度T');
+ylabel('C4选择性');
+title('A9C4选择性');
+x=[250 275 300 350 400;
+    1 1 1 1 1 ];
+[b,bint,r,rint,stats] = regress(y',x');
+x=[250 275 300 350 400;
+    250*250 275*275 300*300 350*350 400*400;
+    1 1 1 1 1 ];
+[b1,bint1,r1,rint1,stats1] = regress(y',x');

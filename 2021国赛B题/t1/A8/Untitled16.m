@@ -1,0 +1,17 @@
+x=[250 275 300 350 400];
+y=[6.3 8.8 13.2 31.7 56.1 ];
+m1=polyfit(x,y,2);
+n1=248:1:410;
+scatter(x,y);
+hold on;
+plot(n1,polyval(m1,n1)); 
+xlabel('温度T');
+ylabel('乙醇转化率');
+title('A8乙醇转化率');
+x=[250 275 300 350 400 ;
+    1 1 1 1 1 ];
+[b,bint,r,rint,stats] = regress(y',x');
+x=[250 275 300 350 400 ;
+    250*250 275*275 300*300 350*350 400*400;
+    1 1 1 1 1 ];
+[b1,bint1,r1,rint1,stats1] = regress(y',x');
